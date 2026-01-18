@@ -1,0 +1,45 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-primary: #050505;
+  --bg-secondary: #161616;
+  --bg-tertiary: #191919;
+  --text-primary: #FFFFFF;
+  --text-secondary: #BEBEBE;
+  --text-tertiary: #E2E2E2;
+  --text-dark: #181818;
+  --accent: #DDDDDD;
+  --accent-text: #212121;
+  --border: #181818;
+  --border-secondary: #242424;
+  --timer-text: #CBCBCB;
+}
+
+body {
+  font-family: 'Fira Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Remove number input arrows */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
