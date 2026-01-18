@@ -1,4 +1,4 @@
-import { TimeEntry } from '../types';
+import type { TimeEntry } from '../types';
 import './History.css';
 
 interface HistoryProps {

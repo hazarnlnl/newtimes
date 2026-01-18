@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TimerStatus } from '../types';
+import type { TimerStatus } from '../types';
 import './Timer.css';
 
 interface TimerProps {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { TimerStatus } from '../types';
+import type { TimerStatus } from '../types';
 
 export const useTimer = (initialDuration: number = 25 * 60) => {
   const [duration, setDuration] = useState(initialDuration);
@@ -12,10 +12,6 @@ export const useTimer = (initialDuration: number = 25 * 60) => {
 
   // Create audio element for notification
   useEffect(() => {
-    // Create a simple beep sound using Web Audio API
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    const audioContext = new AudioContext();
-    
     audioRef.current = new Audio();
     
     return () => {
