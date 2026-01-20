@@ -67,18 +67,23 @@ export const ActivityGraph = ({ entries }: ActivityGraphProps) => {
   // Get month labels for the top
   const getMonthLabels = () => {
     const labels: { month: string; offset: number }[] = [];
-    let lastMonth = -1;
+    let currentMonth = -1;
     
-    weeks.forEach((week, index) => {
-      const firstDay = week[0];
-      const month = firstDay.getMonth();
+    weeks.forEach((week, weekIndex) => {
+      // Check the first day of the week
+      const firstDayOfWeek = week[0];
+      const month = firstDayOfWeek.getMonth();
       
-      if (month !== lastMonth && index > 0) {
-        labels.push({
-          month: firstDay.toLocaleDateString('en-US', { month: 'short' }),
-          offset: index
-        });
-        lastMonth = month;
+      // Only show label if it's a new month and we have enough space
+      if (month !== currentMonth) {
+        currentMonth = month;
+        // Only add if it's not the first week (to avoid cramping)
+        if (weekIndex > 0 || firstDayOfWeek.getDate() <= 7) {
+          labels.push({
+            month: firstDayOfWeek.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+            offset: weekIndex
+          });
+        }
       }
     });
     
@@ -104,20 +109,19 @@ export const ActivityGraph = ({ entries }: ActivityGraphProps) => {
       <div style={{
         display: 'flex',
         position: 'relative',
-        height: '12px',
-        marginLeft: '26px',
-        marginBottom: '4px'
+        height: '14px',
+        marginLeft: '29px',
+        marginBottom: '2px'
       }}>
         {monthLabels.map((label, index) => (
           <div
             key={index}
             style={{
               position: 'absolute',
-              left: `${label.offset * 11}px`,
+              left: `${label.offset * 13}px`,
               fontFamily: 'Fira Mono',
               fontSize: '9px',
-              color: '#808080',
-              textTransform: 'uppercase'
+              color: '#808080'
             }}
           >
             {label.month}
