@@ -13,40 +13,44 @@ export const SimpleTimer = ({ onComplete, onDurationChange, onFinishEarly }: Sim
   const [isPaused, setIsPaused] = useState(false);
   const [initialDuration, setInitialDuration] = useState(25 * 60);
   const [hasCompleted, setHasCompleted] = useState(false);
+  const [endTime, setEndTime] = useState<number | null>(null);
+  const [pausedTimeLeft, setPausedTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
-    if (isRunning && !isPaused) {
+    if (isRunning && !isPaused && endTime) {
       const interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setIsRunning(false);
-            setHasCompleted(true);
-            try {
-              const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-              const oscillator = audioContext.createOscillator();
-              const gainNode = audioContext.createGain();
-              oscillator.connect(gainNode);
-              gainNode.connect(audioContext.destination);
-              oscillator.frequency.value = 800;
-              gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-              gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-              oscillator.start(audioContext.currentTime);
-              oscillator.stop(audioContext.currentTime + 0.5);
-            } catch (err) {
-              console.log('Audio not available');
-            }
-            if (onDurationChange) {
-              onDurationChange(initialDuration);
-            }
-            onComplete();
-            return 0;
+        const now = Date.now();
+        const remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
+        
+        setTimeLeft(remaining);
+        
+        if (remaining <= 0) {
+          setIsRunning(false);
+          setHasCompleted(true);
+          setEndTime(null);
+          try {
+            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 800;
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+          } catch (err) {
+            console.log('Audio not available');
           }
-          return prev - 1;
-        });
-      }, 1000);
+          if (onDurationChange) {
+            onDurationChange(initialDuration);
+          }
+          onComplete();
+        }
+      }, 100); // Check more frequently for accuracy
       return () => clearInterval(interval);
     }
-  }, [isRunning, isPaused, onComplete, onDurationChange, initialDuration]);
+  }, [isRunning, isPaused, endTime, onComplete, onDurationChange, initialDuration]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -54,16 +58,24 @@ export const SimpleTimer = ({ onComplete, onDurationChange, onFinishEarly }: Sim
   };
 
   const handleStart = () => {
+    const now = Date.now();
+    const duration = pausedTimeLeft !== null ? pausedTimeLeft : timeLeft;
+    setEndTime(now + duration * 1000);
     setIsRunning(true);
     setIsPaused(false);
     setHasCompleted(false);
+    setPausedTimeLeft(null);
   };
 
   const handlePause = () => {
+    setPausedTimeLeft(timeLeft);
     setIsPaused(true);
+    setEndTime(null);
   };
 
   const handleResume = () => {
+    const now = Date.now();
+    setEndTime(now + timeLeft * 1000);
     setIsPaused(false);
   };
 
@@ -72,6 +84,8 @@ export const SimpleTimer = ({ onComplete, onDurationChange, onFinishEarly }: Sim
     setIsPaused(false);
     setTimeLeft(initialDuration);
     setHasCompleted(false);
+    setEndTime(null);
+    setPausedTimeLeft(null);
   };
 
   const handleFinish = () => {
@@ -79,6 +93,8 @@ export const SimpleTimer = ({ onComplete, onDurationChange, onFinishEarly }: Sim
     setIsRunning(false);
     setIsPaused(false);
     setTimeLeft(initialDuration);
+    setEndTime(null);
+    setPausedTimeLeft(null);
     if (onFinishEarly && actualDuration > 0) {
       onFinishEarly(actualDuration);
     }
@@ -90,6 +106,8 @@ export const SimpleTimer = ({ onComplete, onDurationChange, onFinishEarly }: Sim
     setInitialDuration(newDuration);
     setTimeLeft(newDuration);
     setHasCompleted(false);
+    setEndTime(null);
+    setPausedTimeLeft(null);
   };
 
   return (
