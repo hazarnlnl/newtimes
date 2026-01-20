@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { SimpleTimer } from './components/SimpleTimer';
 import { SimpleTagInput } from './components/SimpleTagInput';
 import { SimpleHistory } from './components/SimpleHistory';
+import { ActivityGraph } from './components/ActivityGraph';
 import './App.css';
 
 interface TimeEntry {
@@ -125,6 +126,9 @@ function App() {
       <footer className="app-footer">
         MADE BY HAZAR
       </footer>
+
+      {/* Activity Graph - only show on timer view */}
+      {activeView === 'timer' && <ActivityGraph entries={entries} />}
     </div>
   );
 }
